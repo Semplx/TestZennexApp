@@ -7,8 +7,11 @@
 //
 
 #import "ServiceViewController.h"
+#import "DataLoader.h"
 
-@interface ServiceViewController ()
+@interface ServiceViewController () {
+    UITextView *xmlTextView;
+}
 
 @end
 
@@ -18,7 +21,39 @@
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor whiteColor]];
     self.title = @"Service";
-    // Do any additional setup after loading the view.
+    UIScrollView *scrollView = [[UIScrollView alloc] init];
+    [scrollView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    scrollView.backgroundColor = [UIColor redColor];
+    xmlTextView = [[UITextView alloc] init];
+    [xmlTextView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.view addSubview:xmlTextView];
+    self.navigationController.navigationBar.translucent = NO;
+    self.tabBarController.tabBar.translucent = NO;
+    [self.view addConstraints:[NSLayoutConstraint
+            constraintsWithVisualFormat:@"H:|-0-[xmlTextView]-0-|"
+                                options:NSLayoutFormatDirectionLeadingToTrailing
+                                metrics:nil
+                                  views:NSDictionaryOfVariableBindings(xmlTextView)]];
+    [self.view addConstraints:[NSLayoutConstraint
+            constraintsWithVisualFormat:@"V:|-0-[xmlTextView]-0-|"
+                                options:NSLayoutFormatDirectionLeadingToTrailing
+                                metrics:nil
+                                  views:NSDictionaryOfVariableBindings(xmlTextView)]];
+    //self.edgesForExtendedLayout = UIRectEdgeNone;
+    self.automaticallyAdjustsScrollViewInsets = YES;
+    xmlTextView.font = [UIFont systemFontOfSize:14];//    NSLog(xmlTextView.text);
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    DataLoader *dataLoader = [DataLoader sharedInstance];
+    __block NSString *xml = [NSString string];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        xml = [dataLoader getDataStringFromUrl:@"http://bash.zennexgroup.com/service/ru/get.php?type=last"];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            xmlTextView.text = xml;
+        });
+    });
 }
 
 - (void)didReceiveMemoryWarning {

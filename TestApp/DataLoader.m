@@ -20,7 +20,9 @@
 }
 
 - (NSString *)getDataStringFromUrl:(NSString *)url {
-
+    NSData *receivedData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:url]];
+    NSString *dataString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+    return dataString;
 }
 
 @end
